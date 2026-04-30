@@ -14,6 +14,8 @@ import {
 } from "@/lib/scorm/validate-payload";
 
 export const runtime = "nodejs";
+/** Vercel / serverless: allow time for zip + XSD copy (raise on Pro for >10s if needed). */
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   const ct = request.headers.get("content-type") || "";
@@ -136,10 +138,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
     console.error(err);
-    const detail =
-      process.env.NODE_ENV === "development" && err instanceof Error
-        ? err.message
-        : undefined;
+    const showDetail =
+      (process.env.NODE_ENV === "development" ||
+        process.env.EXPORT_ERROR_DETAIL === "1") &&
+      err instanceof Error;
+    const detail = showDetail ? err.message : undefined;
     return NextResponse.json(
       {
         error: "Failed to build SCORM package",
