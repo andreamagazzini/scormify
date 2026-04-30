@@ -136,8 +136,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
     console.error(err);
+    const detail =
+      process.env.NODE_ENV === "development" && err instanceof Error
+        ? err.message
+        : undefined;
     return NextResponse.json(
-      { error: "Failed to build SCORM package" },
+      {
+        error: "Failed to build SCORM package",
+        ...(detail ? { detail } : {}),
+      },
       { status: 500 }
     );
   }

@@ -2,7 +2,7 @@
 
 A small [Next.js](https://nextjs.org) app (**scormify**) that turns **image cards** (with optional text) and a **multiple-choice quiz** into a **SCORM 1.2** zip. The editor is **card-based** with [dnd-kit](https://github.com/clauderic/dnd-kit) (drag to reorder, image upload with inline preview) and a **live slideshow preview** that matches the published SCO.
 
-The SCO is static HTML + `sco-runtime.js` that uses **parent-frame API discovery** (the same idea as [pipwerks](https://github.com/pipwerks/scorm-api-wrapper)) and talks to the LMS with `LMSSetValue` / `LMSCommit` / `LMSFinish`. **Next / Previous** between cards is done in the SCO with JavaScript (one `index.html`, no SCORM 2004 sequencing required); arrow keys are also supported in the player.
+The SCO is static HTML + `sco-runtime.js` (source of truth: `public/sco-runtime.js`, copied into each zip) that uses **parent-frame API discovery** (the same idea as [pipwerks](https://github.com/pipwerks/scorm-api-wrapper)) and talks to the LMS with `LMSSetValue` / `LMSCommit` / `LMSFinish`. **Next / Previous** between cards is done in the SCO with JavaScript (one `index.html`, no SCORM 2004 sequencing required); arrow keys are also supported in the player.
 
 Packaging uses [`simple-scorm-packager`](https://github.com/lmihaidaniel/simple-scorm-packager) (`imsmanifest.xml`, XSDs, zip)—similar to [`vite-plugin-scorm`](https://www.npmjs.com/package/vite-plugin-scorm) post-build zips.
 

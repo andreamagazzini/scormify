@@ -1,4 +1,5 @@
 import { createRequire } from "module";
+import { existsSync } from "fs";
 import fs from "fs/promises";
 import path from "path";
 import os from "os";
@@ -40,6 +41,25 @@ function sanitizeFilenamePart(name: string): string {
   return name.replace(/[^\w\-]+/g, "_").slice(0, 80) || "course";
 }
 
+/** Prefer `public/` so serverless deploys (no `src/` on disk) still find the file. */
+function resolveScoRuntimeSourcePath(): string {
+  const publicPath = path.join(process.cwd(), "public", RUNTIME_FILENAME);
+  if (existsSync(publicPath)) {
+    return publicPath;
+  }
+  const srcFallback = path.join(
+    process.cwd(),
+    "src/lib/scorm",
+    RUNTIME_FILENAME
+  );
+  if (existsSync(srcFallback)) {
+    return srcFallback;
+  }
+  throw new Error(
+    `Missing ${RUNTIME_FILENAME}: add public/${RUNTIME_FILENAME} (used in production) or keep src/lib/scorm/${RUNTIME_FILENAME} for local dev.`
+  );
+}
+
 export async function buildScormZip(
   input: ExportCourseInput
 ): Promise<{ buffer: Buffer; filename: string }> {
@@ -78,7 +98,7 @@ export async function buildScormZip(
   const outputFolder = path.join(workDir, "zip-out");
   const assetsDir = path.join(sourceDir, "assets");
 
-  const runtimeSrc = path.join(process.cwd(), "src/lib/scorm", RUNTIME_FILENAME);
+  const runtimeSrc = resolveScoRuntimeSourcePath();
   const runtimeDest = path.join(sourceDir, RUNTIME_FILENAME);
 
   const indexHtml = `<!DOCTYPE html>
